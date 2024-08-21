@@ -1,0 +1,24 @@
+name = "backend"
+compatibility_date = "2024-08-21"
+
+DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiYzE2ZGRhOWQtNjJhNi00ZGMwLTlmNWYtZDljMzk1MGI3ZWQ1IiwidGVuYW50X2lkIjoiYmE1NjkyZjA5YTA0ZWRkM2YxOTkyZTI4ZDNhMTUyNDI1ZDQzZjEwYWYwMGUwZDI5MTIxZGEzM2ZiYzI0ZTAzNCIsImludGVybmFsX3NlY3JldCI6ImU3NWZkZmUxLTkwZjUtNGI4ZC1hNmRlLTk3Zjg5Njg4NjlkOCJ9.cqIrYvM_G7dcoCGgZJGE8ix4jQOzTxxFPaaqR2_o0dE"
+DIRECT_URL="postgres://avnadmin:AVNS_TiJ95TuTIe17J3UmH2K@pg-3fc778bc-justadityag-f21c.h.aivencloud.com:14568/defaultdb?sslmode=require"
+
+# [vars]
+# MY_VAR = "my-variable"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database"
+# database_id = ""
+
+# [ai]
+# binding = "AI"
