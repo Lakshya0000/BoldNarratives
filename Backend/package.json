@@ -1,5 +1,5 @@
 {
-  "name": "Backend",
+  "name": "backend",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts"
@@ -7,6 +7,8 @@
   "dependencies": {
     "@prisma/client": "^5.18.0",
     "@prisma/extension-accelerate": "^1.1.0",
+    "backend": "file:",
+    "Backend": "file:",
     "hono": "^4.5.7"
   },
   "devDependencies": {
