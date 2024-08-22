@@ -13,7 +13,7 @@ const app = new Hono<{
 
 
 
-app.use('/*,cors()');
+app.use('/*',cors());
 app.route('/api/user',userRouter);
 app.route('/api/blog',blogRouter);
 
