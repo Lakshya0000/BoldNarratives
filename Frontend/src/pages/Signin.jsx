@@ -12,7 +12,8 @@ const Signin = () => {
 
     return (
         <div>
-            <div className='h-screen  bg-custom-teal flex justify-center items-center'>
+            <div className='h-screen  bg-custom-teal flex justify-center items-center '>
+                
                 <div className='absolute top-0 left-0 flex flex-row items-center justify-center'>
                     
                     <img src=" /blog2.png" alt="" className='w-32' />
