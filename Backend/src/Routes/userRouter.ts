@@ -62,20 +62,15 @@ userRouter.post('/signup', async (c) => {
             password: user.password,
             exp: Math.floor(Date.now() / 1000) + 60 * 60,
         }
-          // Add this before the sign function to verify
-
+        // Add this before the sign function to verify
         const jwtToken = await sign(payload, c.env.JWT_SECRET);
         return c.json({token:jwtToken});
-
     }
     catch (e) {
         c.status(500);
         console.log(e);
         return c.text("error occcurred")
     }
-
-
-
 })
 
 const signinBody = z.object({
