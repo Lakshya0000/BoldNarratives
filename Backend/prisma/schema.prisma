@@ -30,8 +30,8 @@ model Blog {
   authorId Int
   content String
   genre String
-  vote Int
-  views Int
+  vote Int @default(0)
+  views Int @default(0)
   comments Comment[]
   author User @relation(fields: [authorId],references: [id])
 }
