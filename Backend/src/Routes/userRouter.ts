@@ -59,23 +59,18 @@ userRouter.post('/signup', async (c) => {
         })
         const payload = {
             email: user.email,
-            password: user.password,
+            id: user.id,
             exp: Math.floor(Date.now() / 1000) + 60 * 60,
         }
-          // Add this before the sign function to verify
-
+        // Add this before the sign function to verify
         const jwtToken = await sign(payload, c.env.JWT_SECRET);
         return c.json({token:jwtToken});
-
     }
     catch (e) {
         c.status(500);
         console.log(e);
         return c.text("error occcurred")
     }
-
-
-
 })
 
 const signinBody = z.object({
@@ -106,7 +101,7 @@ userRouter.post('/signin', async (c) => {
         if (userExists) {
             const payload = {
                 email: userExists.email,
-                password: userExists.password,
+                id: userExists.id,
                 exp: Math.floor(Date.now() / 1000) + 60 * 60,
             }
             const jwtToken = await sign(payload, c.env.JWT_SECRET);

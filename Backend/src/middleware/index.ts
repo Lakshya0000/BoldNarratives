@@ -8,7 +8,7 @@ type Binding={
     JWT_SECRET:string
 }
 const app = new Hono<{ Bindings: Binding,Variables: {
-    userId: string;
+    userId: Number;
 } }>()
 
 const authmiddleware = async (c:any,next:Next)=>{
@@ -24,7 +24,7 @@ const authmiddleware = async (c:any,next:Next)=>{
         const token = authHeader.replace('Bearer ', '')
         const verifyUser= await verify(authHeader,secret2);
         if(verifyUser){
-            c.set("userId",verifyUser.email);
+            c.set("userId",verifyUser.id);
             await next();
         }
         else
