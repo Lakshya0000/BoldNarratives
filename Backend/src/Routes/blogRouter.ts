@@ -122,8 +122,36 @@ blogRouter.post('/', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate())
-    const blog = await prisma.blog.create({
+    try{const blog = await prisma.blog.create({
         data : {...body, authorId : c.get("userId")}
     })
-    return c.json({blog})
+    return c.json({blog})}
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }
+})
+blogRouter.put('/update', async (c) => {
+    try{
+        const body = await c.req.json();
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const blog = await prisma.blog.update({
+            where : {
+                id : body.id
+            },
+            data : {
+                vote : body.vote,
+                views : body.views
+            }
+        })
+        return c.json({blog})
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
 })
