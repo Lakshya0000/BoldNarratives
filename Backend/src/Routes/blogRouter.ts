@@ -48,7 +48,7 @@ blogRouter.get('/all', async (c) =>  {
     const filter_blogs = blogs.map((blog) => {
         return {...blog, votes : blog._count.votes}
     }) 
-    return c.json({filter_blogs})
+    return c.json(filter_blogs);
 })
 
 blogRouter.get('/search', async (c)=>{
