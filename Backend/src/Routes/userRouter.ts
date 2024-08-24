@@ -1,8 +1,11 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import {  sign } from 'hono/jwt'
+import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { followRouter } from "./followRouter";
+import { followingRouter } from "./followingRouter";
 type Bindings = {
     DATABASE_URL: string
     JWT_SECRET: string
@@ -48,11 +51,13 @@ userRouter.post('/signup', async (c) => {
     }
 
     try {
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(body.password, salt);
         const user = await prisma.user.create({
             data: {
                 email: body.email,
                 name: body.name,
-                password: body.password
+                password: hash
             }
 
 
@@ -94,11 +99,12 @@ userRouter.post('/signin', async (c) => {
         const userExists = await prisma.user.findFirst({
             where: {
                 email: body.email,
-                password: body.password
             }
         })
 
-        if (userExists) {
+        if (userExists && bcrypt.compareSync(body.password, userExists.password)) {
+        
+
             const payload = {
                 email: userExists.email,
                 id: userExists.id,
@@ -121,3 +127,6 @@ userRouter.post('/signin', async (c) => {
         return c.text("Error")
     }
 })
+
+userRouter.route('/followers', followRouter)
+userRouter.route('/following',followingRouter)
