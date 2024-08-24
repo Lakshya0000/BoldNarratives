@@ -70,7 +70,7 @@ userRouter.post('/signup', async (c) => {
         }
         // Add this before the sign function to verify
         const jwtToken = await sign(payload, c.env.JWT_SECRET);
-        return c.json({token:jwtToken});
+        return c.text(jwtToken);
     }
     catch (e) {
         c.status(500);
@@ -114,10 +114,7 @@ userRouter.post('/signin', async (c) => {
             const jwtToken = await sign(payload, c.env.JWT_SECRET);
 
             c.status(200);
-            return c.json({
-                jwtToken,
-                message: "user logged in successfully"
-            });
+            return c.text(jwtToken);
         }
         else {
             c.text("error occurred")

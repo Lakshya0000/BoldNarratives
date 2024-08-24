@@ -4,11 +4,34 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heading } from '../components/Heading';
 import { InputBox } from '../components/InputBox';
 import { Button } from '../components/Button';
+import axios from 'axios';
+import { BACKEND_URL } from '../config';
 const Signup = () => {
     
     const navigate =useNavigate();
+    const [firstname,setFirstname]=useState("");
+    const [lastname,setLastname]=useState("");
+    const [email,setEmail]=useState("");
+    const [password,setPassword]=useState("");
+
     const handleSignin = async () => {
-      
+      if (!firstname || !lastname || !email || !password) {
+        setError("All fields are required");
+        return;
+    }
+      try{
+        const response= await axios.post(`${BACKEND_URL}/api/user/signup`,{
+            name:firstname+lastname,
+            email:email,
+            password:password
+        })
+        const jwt =response.data;
+        localStorage.setItem("token",jwt);
+        navigate("/home")
+       }
+       catch(e){
+        alert("Error while signing up");
+       }
     };
   
     
@@ -31,7 +54,7 @@ const Signup = () => {
                 setLastname(e.target.value);
               }}/>
               <InputBox label={"Email"} place={"aditya@gmail.com"} onChange={(e)=>{
-                setUsername(e.target.value);
+                setEmail(e.target.value);
               }}/>
               <InputBox label={"Password"} place={"Password"} onChange={(e)=>{
                 setPassword(e.target.value);

@@ -1,13 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Heading } from '../components/Heading';
 import { InputBox } from '../components/InputBox';
 import { Button } from '../components/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../config';
+import axios from 'axios';
 
 const Signin = () => {
+    const [email,setEmail]=useState("");
+    const [password,setPassword]=useState("");
+    const navigate=useNavigate();
 
-    const handleSignup = async () => {
-
+    const handleSignin = async () => {
+       try{
+        if (!email || !password) {
+            setError("All fields are required");
+            return;
+        }
+        const response= await axios.post(`${BACKEND_URL}/api/user/signin`,{
+            email:email,
+            password:password
+        })
+        const jwt =response.data;
+        localStorage.setItem("token",jwt);
+        navigate("/home")
+       }
+       catch(e){
+        alert("Error while signing in");
+       }
     };
 
     return (
@@ -26,12 +46,12 @@ const Signin = () => {
                     </div>
 
                     <InputBox label={"Email"} place={"aditya@gmail.com"} onChange={(e) => {
-                        setUsername(e.target.value)
+                        setEmail(e.target.value)
                     }} />
                     <InputBox label={"Password"} place={"Password"} onChange={(e) => {
                         setPassword(e.target.value)
                     }} />
-                    <Button label={"Sign In"} onClick={handleSignup} />
+                    <Button label={"Sign In"} onClick={handleSignin} />
 
                     <div>
                         Already have an account? <Link to={"/signup"} className=' underline'>Signup</Link>
