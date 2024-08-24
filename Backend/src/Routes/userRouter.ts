@@ -120,7 +120,7 @@ userRouter.post('/signin', async (c) => {
             });
         }
         else {
-            c.text("error occurred")
+            return c.text("invalid credentials")
         }
     } catch (e) {
         console.log(e);
