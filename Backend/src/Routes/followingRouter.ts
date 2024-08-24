@@ -32,7 +32,7 @@ export const followingRouter = new Hono<{ Bindings: Bindings,
                 }
             });
             if (following.length === 0) {
-                return c.json({ message: "No followers found" }, 404);
+                return c.json({ message: "No following found" }, 404);
             }
             
             return c.json({ following: following });
@@ -44,4 +44,4 @@ export const followingRouter = new Hono<{ Bindings: Bindings,
         }
     
     
-    })    
+    })

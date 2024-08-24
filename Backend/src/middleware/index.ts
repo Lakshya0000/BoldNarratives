@@ -25,7 +25,6 @@ const authmiddleware = async (c:any,next:Next)=>{
         const verifyUser= await verify(authHeader,secret2);
         if(verifyUser){
             c.set("userId",verifyUser.id);
-            console.log(verifyUser.id);
             await next();
         }
         else
