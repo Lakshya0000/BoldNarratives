@@ -117,7 +117,7 @@ userRouter.post('/signin', async (c) => {
             return c.text(jwtToken);
         }
         else {
-            c.text("error occurred")
+            return c.text("invalid credentials")
         }
     } catch (e) {
         console.log(e);
