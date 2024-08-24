@@ -6,11 +6,12 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { followRouter } from "./followRouter";
 import { followingRouter } from "./followingRouter";
+import authmiddleware from "../middleware";
 type Bindings = {
     DATABASE_URL: string
     JWT_SECRET: string
 }
-export const userRouter = new Hono<{ Bindings: Bindings }>()
+export const userRouter = new Hono<{ Bindings: Bindings,Variables:{userId:Number}}>()
 
 const signupBody = z.object({
     email: z.string().email(),
@@ -127,6 +128,105 @@ userRouter.post('/signin', async (c) => {
         return c.text("Error")
     }
 })
+userRouter.post('/follow', authmiddleware, async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate());
+
+    const userIdParam=c.get("userId")
+    const  {targetUserIdParam}  = await c.req.json(); 
+    const userId = Number(userIdParam);
+    const targetUserId = Number(targetUserIdParam);
+    
+    
+
+    if (isNaN(userId) || isNaN(targetUserId)) {
+        return c.json({ message: "Invalid userId or targetUserId" }, 400);
+    }
+
+    if (userId === targetUserId) {
+        return c.json({ message: "You cannot follow yourself" }, 400);
+    }
+
+    try {
+        const existingFollow = await prisma.follows.findFirst({
+            where: {
+                followerId:targetUserId,
+                followingId:userId
+            }
+        });
+
+        if (existingFollow) {
+            return c.json({ message: "You are already following this user" }, 400);
+        }
+
+        // Create the follow relationship
+        const follow = await prisma.follows.create({
+            data: {
+                followerId: targetUserId,
+                followingId: userId
+            }
+        });
+
+        return c.json({ message: "Successfully followed the user", follow: follow });
+    } catch (e) {
+        console.log(e);
+        return c.json({
+            message: "Error occurred while trying to follow the user"
+        }, 500);
+    }
+});
+
+userRouter.post('/unfollow', authmiddleware, async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate());
+
+    const userIdParam=c.get("userId")
+    const  {targetUserIdParam } = await c.req.json(); 
+    const userId = Number(userIdParam);
+    const targetUserId = Number(targetUserIdParam);
+    
+
+    if (isNaN(userId) || isNaN(targetUserId)) {
+        return c.json({ message: "Invalid userId or targetUserId" }, 400);
+    }
+
+    if (userId === targetUserId) {
+        return c.json({ message: "You cannot unfollow yourself" }, 400);
+    }
+
+    try {
+        // Check if the follow relationship exists
+        const existingFollow = await prisma.follows.findFirst({
+            where: {
+                followerId: targetUserId,
+                followingId: userId
+            }
+        });
+
+        if (!existingFollow) {
+            return c.json({ message: "You are not following this user" }, 400);
+        }
+
+        // Delete the follow relationship
+        await prisma.follows.delete({
+            where: {
+                followerId_followingId: {
+                    followerId: existingFollow.followerId,
+                    followingId: existingFollow.followingId
+                }
+            }
+        });
+
+        return c.json({ message: "Successfully unfollowed the user" });
+    } catch (e) {
+        console.log(e);
+        return c.json({
+            message: "Error occurred while trying to unfollow the user"
+        }, 500);
+    }
+});
 
 userRouter.route('/followers', followRouter)
 userRouter.route('/following',followingRouter)
