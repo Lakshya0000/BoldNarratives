@@ -3,6 +3,7 @@ import authmiddleware from "../middleware";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { z } from "zod";
+import dayjs from "dayjs";
 export const blogRouter=new Hono<{
     Bindings:{
         DATABASE_URL:string
@@ -22,12 +23,74 @@ blogRouter.get('/protected',  (c) => {
         
     })
 })
-
-blogRouter.get('/all', async (c) =>  {
+blogRouter.get('total', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate())
+    const body = await c.req.json();
+    const whereFilter: { genre?: string , authorId? : number } = {};
+    if(body.genre !== "all"){
+        whereFilter.genre = body.genre
+    }
+    if(body.authorId){
+        whereFilter.authorId = Number(body.authorId)
+    }
+    const total = await prisma.blog.count({
+        where : whereFilter
+    })
+    return c.json({total})
+})
+blogRouter.get('/sort/time/:id', async (c) =>  {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate())
+    const id = (c.req.param("id"))
+    const body = await c.req.json();
+    const whereFilter: { genre?: string , authorId? : number } = {};
+    if(body.genre !== "all"){
+        whereFilter.genre = body.genre
+    }
+    if(body.authorId){
+        whereFilter.authorId = Number(body.authorId)
+    }
+    if(id === "asc"){
+        const blogs = await prisma.blog.findMany({
+            where : whereFilter,
+            orderBy : {
+                createdAt : "asc"
+            },
+            skip : body.skip,
+            take : 10,
+            select : {
+                id : true,
+                title : true,
+                views : true,
+                author : {
+                    select : {
+                        name : true
+                    }
+                },
+                createdAt : true,
+                genre : true,
+                _count : {
+                    select : {
+                        votes : true
+                    }
+                }
+            }
+        })
+        const filter_blogs = blogs.map((blog) => {
+            return {...blog, votes : blog._count.votes}
+        }) 
+        return c.json(filter_blogs);
+    }
     const blogs = await prisma.blog.findMany({
+        where : whereFilter,
+        orderBy : {
+            createdAt : "desc"
+        },
+        skip : body.skip,
+        take : 10,
         select : {
             id : true,
             title : true,
@@ -37,6 +100,7 @@ blogRouter.get('/all', async (c) =>  {
                     name : true
                 }
             },
+            createdAt : true,
             genre : true,
             _count : {
                 select : {
@@ -50,7 +114,108 @@ blogRouter.get('/all', async (c) =>  {
     }) 
     return c.json(filter_blogs);
 })
-
+blogRouter.get('/sort/views', async (c) =>  {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate())
+    const body = await c.req.json();
+    const whereFilter: { genre?: string , authorId? : number } = {};
+    if(body.genre !== "all"){
+        whereFilter.genre = body.genre
+    }
+    if(body.authorId){
+        whereFilter.authorId = Number(body.authorId)
+    }
+    const blogs = await prisma.blog.findMany({
+        where : whereFilter,
+        orderBy : [{
+            views : "desc",
+            
+        },
+        {
+            votes : {
+                _count : "desc"
+            }
+        },
+        {
+            createdAt : "desc"
+        }
+        ],
+        skip : body.skip,
+        take : 10,
+        select : {
+            id : true,
+            title : true,
+            views : true,
+            author : {
+                select : {
+                    name : true
+                }
+            },
+            _count : {
+                select : {
+                    votes : true
+                }
+            },
+            createdAt : true,
+            genre : true
+        }
+    })
+    const filter_blogs = blogs.map((blog) => {
+        return {...blog, votes : blog._count.votes}
+    }) 
+    return c.json(filter_blogs);
+})
+blogRouter.get('/sort/trending', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate())
+    const blogs = await prisma.blog.findMany({
+        select: {
+          id: true,
+          title: true,
+          views: true,
+          createdAt: true, 
+          _count: {
+            select: {
+              votes: true,
+            },
+          },
+        },
+        orderBy: [
+          {
+            views: 'desc',
+          },
+          {
+            votes: {
+              _count: 'desc',
+            },
+          },
+        ],
+        take: 10,
+      });
+    
+      // Step 2: Further refine the list based on a trending score
+      const weight = 2; // Weight for likes
+      const trendingBlogs = blogs.map(blog => {
+        const likes = blog._count.votes || 0;
+        const views = blog.views || 0;
+        const ageInDays = dayjs().diff(dayjs(blog.createdAt), 'days') || 1; 
+        const score = (views + likes * weight) / ageInDays;
+    
+        return {
+          ...blog,
+          score,
+        };
+      });
+    
+      // Step 3: Sort blogs by the score and get the top 10
+      const top10TrendingBlogs = trendingBlogs
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+    
+      return c.json(top10TrendingBlogs);
+})
 blogRouter.get('/search', async (c)=>{
     try {
         const search = c.req.query("search")
@@ -69,10 +234,21 @@ blogRouter.get('/search', async (c)=>{
                     contains : search
                 }
             },
+            orderBy : [
+                {
+                  views: 'desc',
+                },
+                {
+                  votes: {
+                    _count: 'desc',
+                  },
+                },
+            ],
             take : 5,
             select : {
                 id : true,
-                title : true
+                title : true,
+                createdAt : true
             }
         })
         return c.json({blogs})
@@ -99,6 +275,7 @@ blogRouter.get('/blog/:id',async (c) => {
                     name : true
                 }
             },
+            createdAt : true,
             comments : true,
             _count : {
                 select : {
@@ -269,6 +446,59 @@ blogRouter.post('/comment', async (c) => {
             }
         })
         return c.json({comment})
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
+})
+
+blogRouter.get('/comment', async (c) => {
+    try{
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const body = await c.req.json();
+        const comments = await prisma.comment.findMany({
+            where : {
+                BlogId : Number(body.id)
+            },
+            orderBy : {
+                createdAt : "desc"
+            },
+            select : {
+                id : true,
+                comment : true,
+                authorId : true,
+                createdAt : true,
+                author : {
+                    select : {
+                        name : true
+                    }
+                }
+            }
+        })
+        return c.json({comments})
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
+})
+
+blogRouter.delete('/comment/:id', async (c) => {
+    try{
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const comment = await prisma.comment.delete({
+            where : {
+                id : Number(c.req.param("id"))
+            }
+        })
+        return c.json({message : "Comment deleted"})
     }
     catch(e){
         c.status(500);

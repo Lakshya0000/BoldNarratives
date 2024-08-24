@@ -28,6 +28,7 @@ model Blog {
   id Int @id @default(autoincrement())
   title String 
   authorId Int
+  createdAt DateTime @default(now())
   content String
   genre String
   views Int @default(0)
@@ -40,6 +41,7 @@ model Comment{
   id Int @id @default(autoincrement())
   authorId Int 
   comment String
+  createdAt DateTime @default(now())
   BlogId Int
   author User @relation(fields: [authorId],references: [id])
   post Blog @relation(fields: [BlogId],references: [id])
