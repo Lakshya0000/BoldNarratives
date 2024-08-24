@@ -30,8 +30,8 @@ model Blog {
   authorId Int
   content String
   genre String
-  vote Int @default(0)
   views Int @default(0)
+  votes Vote[]
   comments Comment[]
   author User @relation(fields: [authorId],references: [id])
 }
@@ -45,12 +45,18 @@ model Comment{
   post Blog @relation(fields: [BlogId],references: [id])
 }
 
+model Vote{
+  id Int @id @default(autoincrement())
+  userId Int
+  blogId Int
+  blog Blog @relation(fields : [blogId],references: [id])
+  @@unique([userId, blogId])
+}
+
 model Follows {
   followerId  Int
   followingId Int
-
   following  User  @relation("UserFollowedBy", fields: [followerId], references: [id])
   followers User  @relation("UserFollows", fields: [followingId], references: [id])
-
   @@id([followerId, followingId])
 }

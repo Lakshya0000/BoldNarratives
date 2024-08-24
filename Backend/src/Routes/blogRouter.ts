@@ -32,10 +32,15 @@ blogRouter.get('/all', async (c) =>  {
             id : true,
             title : true,
             views : true,
-            vote : true,
             author : {
                 select : {
                     name : true
+                }
+            },
+            _count : {
+                select : {
+                    comments : true,
+                    votes : true
                 }
             }
         }
