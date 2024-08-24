@@ -37,16 +37,18 @@ blogRouter.get('/all', async (c) =>  {
                     name : true
                 }
             },
+            genre : true,
             _count : {
                 select : {
-                    comments : true,
                     votes : true
                 }
             }
         }
     })
- 
-    return c.json({blogs})
+    const filter_blogs = blogs.map((blog) => {
+        return {...blog, votes : blog._count.votes}
+    }) 
+    return c.json({filter_blogs})
 })
 
 blogRouter.get('/search', async (c)=>{
@@ -67,7 +69,7 @@ blogRouter.get('/search', async (c)=>{
                     contains : search
                 }
             },
-            take : 4,
+            take : 5,
             select : {
                 id : true,
                 title : true
@@ -78,7 +80,7 @@ blogRouter.get('/search', async (c)=>{
         console.log(error)
     }
 })
-blogRouter.get('/:id',async (c) => {
+blogRouter.get('/blog/:id',async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate())
@@ -91,11 +93,16 @@ blogRouter.get('/:id',async (c) => {
             title : true,
             content : true,
             views : true,
-            vote : true,
             authorId : true,
             author : {
                 select : {
                     name : true
+                }
+            },
+            comments : true,
+            _count : {
+                select : {
+                    votes : true
                 }
             }
         }
@@ -137,7 +144,93 @@ blogRouter.post('/', async (c) => {
         return c.text("error occcurred")
     }
 })
-blogRouter.put('/update', async (c) => {
+blogRouter.put('/update/:id', async (c) => {
+    try{
+        const body = await c.req.json();
+        const bodyId = parseInt(c.req.param("id"))
+        const safeBody = blogBody.safeParse(body)
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const blog = await prisma.blog.update({
+            where : {
+                id : bodyId
+            },
+            data : {
+                ...safeBody.data
+            }
+        })
+        return c.json({blog})
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
+})
+blogRouter.get('/vote/check', async (c) => {
+    try{
+        const body = await c.req.json();
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const userId = Number(c.get("userId"))
+        const blog = await prisma.vote.findFirst({
+            where : {
+                userId : userId,
+                blogId : body.id
+            }
+        })
+        if(blog){
+            return c.json({vote : true});
+        }
+        return c.json({vote : false});
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
+})
+
+blogRouter.put('/vote', async (c) => {
+    try{
+            const body = await c.req.json();
+            const prisma = new PrismaClient({
+                datasourceUrl: c.env.DATABASE_URL
+            }).$extends(withAccelerate())
+            const userId = Number(c.get("userId"))
+            const blog = await prisma.vote.findFirst({
+                where : {
+                    userId : userId,
+                    blogId : body.id
+                }
+            })
+            if(blog){
+                const downVote = await prisma.vote.deleteMany({
+                    where : {
+                        userId : userId,
+                        blogId : body.id
+                    }
+                })
+                return c.json({vote : false})
+            }
+            const upVote = await prisma.vote.create({
+                data : {
+                    userId : userId,
+                    blogId : body.id
+                }
+            })
+            return c.json({vote : true})  
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
+})
+
+blogRouter.put('/view', async (c) => {
     try{
         const body = await c.req.json();
         const prisma = new PrismaClient({
@@ -145,14 +238,37 @@ blogRouter.put('/update', async (c) => {
         }).$extends(withAccelerate())
         const blog = await prisma.blog.update({
             where : {
-                id : body.id
+                id : Number(body.id)
             },
             data : {
-                vote : body.vote,
-                views : body.views
+                views : {
+                    increment : 1
+                }
             }
         })
         return c.json({blog})
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }    
+})
+
+blogRouter.post('/comment', async (c) => {
+    try{
+        const body = await c.req.json();
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const userId = Number(c.get("userId"))
+        const comment = await prisma.comment.create({
+            data : {
+                ...body,
+                userId : userId
+            }
+        })
+        return c.json({comment})
     }
     catch(e){
         c.status(500);
