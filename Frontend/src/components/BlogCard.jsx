@@ -56,12 +56,12 @@ export const BlogCard = ({
     .catch(error => {
       console.error("Error upvoting:", error);
     });
-  },[id])
+  },[])
+
   useEffect(() => {
-    // This effect runs every time the `vote` or `isUpvoted` state changes
-    console.log(`Votes: ${votes}, Is Upvoted: ${isUpvoted}`);
-    // You can also trigger additional logic here, such as animations or updates to the DOM
-  }, [votes, isUpvoted]); 
+    
+
+  }, [votes, isUpvoted,id]); 
 
   const [color, setColor] = useState('currentColor');
   const handleClick = () => {

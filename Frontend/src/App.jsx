@@ -5,6 +5,7 @@ import Signup from './pages/Signup'
 import {BrowserRouter,Routes,Route,Navigate} from 'react-router-dom'
 import Landing from './pages/Landing'
 import HomePage from './pages/HomePage'
+import BlogPage from './pages/BlogPage'
 function App() {
     return (
       <BrowserRouter>
@@ -14,7 +15,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<HomePage />} />
-
+        <Route path='/blog' element={<BlogPage/>}/>
         
         
         

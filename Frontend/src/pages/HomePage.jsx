@@ -13,9 +13,10 @@ const HomePage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [error, setError] = useState(null);
     const navigate=useNavigate();
+    const skipPages= (page-1)*10;
     const genre={
         genre:"all",
-        
+        skip:skipPages
     }
     useEffect(() => {
         axios.post(`${BACKEND_URL}/api/blog/sort/views`, genre,{
@@ -42,7 +43,7 @@ const HomePage = () => {
                 }
                 setLoading(false);
             });
-    }, [])
+    }, [page])
     useEffect(() => {
         axios.post(`${BACKEND_URL}/api/blog/total`,genre, {
             headers: {
@@ -50,8 +51,8 @@ const HomePage = () => {
             }
         })
             .then(response => {
-                
-                setTotalPages(response.data.total)
+                const totalPages=Math.ceil(response.data.total/10);
+                setTotalPages(Math.max(totalPages, 1))
                 setLoading(false);
             })
             .catch(err => {
@@ -86,6 +87,7 @@ const HomePage = () => {
             <div>
                 {loading && <div className='w-screen flex justify-between flex-col items-center'><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /></div>}
                 {!loading && <div> {blogs.map(blog => <BlogCard
+                    key={blog.id}
                     id={blog.id}
                     authorName={blog.author.name || "Anonymous"}
                     title={blog.title}
