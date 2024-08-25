@@ -40,7 +40,7 @@ blogRouter.post('total', async (c) => {
     })
     return c.json({total})
 })
-blogRouter.get('/sort/time/:id', async (c) =>  {
+blogRouter.post('/sort/time/:id', async (c) =>  {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate())
@@ -65,6 +65,7 @@ blogRouter.get('/sort/time/:id', async (c) =>  {
                 id : true,
                 title : true,
                 views : true,
+                authorId : true,
                 author : {
                     select : {
                         name : true
@@ -95,6 +96,7 @@ blogRouter.get('/sort/time/:id', async (c) =>  {
             id : true,
             title : true,
             views : true,
+            authorId : true,
             author : {
                 select : {
                     name : true
@@ -146,6 +148,7 @@ blogRouter.post('/sort/views', async (c) =>  {
             id : true,
             title : true,
             views : true,
+            authorId : true,
             author : {
                 select : {
                     name : true
@@ -175,6 +178,7 @@ blogRouter.get('/sort/trending', async (c) => {
           title: true,
           views: true,
           createdAt: true, 
+          authorId: true,
           _count: {
             select: {
               votes: true,

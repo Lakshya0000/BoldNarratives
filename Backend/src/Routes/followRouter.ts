@@ -12,7 +12,6 @@ export const followRouter = new Hono<{
         userId: Number;
     }
 }>();
-
 followRouter.get('/', authmiddleware, async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
@@ -30,24 +29,28 @@ followRouter.get('/', authmiddleware, async (c) => {
                 followerId: userId
             },
             select: {
-                followingId: true,
+                followingId: true, 
+                followers : {
+                    select : {
+                        name : true
+                    }
+                }              
             }
         });
-        if (followers.length === 0) {
-            return c.json({ message: "No followers found" }, 404);
-        }
-
-        return c.json({ followers: followers });
+        const filter_followers = followers.map((follower)=>{
+            return {
+                name : follower.followers.name,
+                id : follower.followingId
+            }
+        })        
+        return c.json(filter_followers);
     } catch (e) {
         console.log(e);
         return c.json({
             message: "error occurred"
         })
     }
-
-
 })
-
 // followRouter.get('/:followerId', async (c) => {
 //     const prisma = new PrismaClient({
 //         datasourceUrl: c.env.DATABASE_URL

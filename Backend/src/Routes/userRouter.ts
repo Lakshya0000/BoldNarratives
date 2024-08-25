@@ -18,7 +18,31 @@ const signupBody = z.object({
     name: z.string(),
     password: z.string()
 })
-
+userRouter.get('/getuser/:id',async (c)=>{
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate())
+    const userId = Number(c.req.param("id"));
+    if (isNaN(userId)) {
+        return c.json({ message: "Invalid userId" }, 400);
+    }
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+        if (!user) {
+            return c.json({ message: "User not found" }, 404);
+        }
+        return c.json(user);
+    } catch (e) {
+        console.log(e);
+        return c.json({
+            message: "Error occurred while trying to get the user"
+        }, 500);
+    }
+})
 userRouter.post('/signup', async (c) => {
     const body = await c.req.json();
     const { success } = signupBody.safeParse(body)
@@ -123,6 +147,38 @@ userRouter.post('/signin', async (c) => {
         console.log(e);
         c.status(500)
         return c.text("Error")
+    }
+})
+userRouter.post('/follow/check', authmiddleware, async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate());
+    const userIdParam=c.get("userId")
+    const  {targetUserIdParam} = await c.req.json();
+    const userId = Number(userIdParam);
+    const targetUserId = Number(targetUserIdParam);
+    if (isNaN(userId) || isNaN(targetUserId)) {
+        return c.json({ message: "Invalid userId or targetUserId" }, 400);
+    }
+    if (userId === targetUserId) {
+        return c.json({ message: "You cannot follow yourself" }, 400);
+    }
+    try {
+        const existingFollow = await prisma.follows.findFirst({
+            where: {
+                followerId: targetUserId,
+                followingId: userId
+            }
+        });
+        if (existingFollow) {
+            return c.json({ follow : true });
+        }
+        return c.json({ follow : false });
+    } catch (e) {
+        console.log(e);
+        return c.json({
+            message: "Error occurred while trying to check if you are following the user"
+        }, 500);
     }
 })
 userRouter.post('/follow', authmiddleware, async (c) => {
