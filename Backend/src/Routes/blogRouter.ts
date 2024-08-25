@@ -23,7 +23,7 @@ blogRouter.get('/protected',  (c) => {
         
     })
 })
-blogRouter.get('total', async (c) => {
+blogRouter.post('total', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate())
@@ -47,7 +47,7 @@ blogRouter.get('/sort/time/:id', async (c) =>  {
     const id = (c.req.param("id"))
     const body = await c.req.json();
     const whereFilter: { genre?: string , authorId? : number } = {};
-    if(body.genre !== "all"){
+    if(body.genre&&body.genre !== "all"){
         whereFilter.genre = body.genre
     }
     if(body.authorId){
@@ -114,13 +114,13 @@ blogRouter.get('/sort/time/:id', async (c) =>  {
     }) 
     return c.json(filter_blogs);
 })
-blogRouter.get('/sort/views', async (c) =>  {
+blogRouter.post('/sort/views', async (c) =>  {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate())
     const body = await c.req.json();
     const whereFilter: { genre?: string , authorId? : number } = {};
-    if(body.genre !== "all"){
+    if(body.genre && body.genre !== "all"){
         whereFilter.genre = body.genre
     }
     if(body.authorId){
@@ -129,8 +129,7 @@ blogRouter.get('/sort/views', async (c) =>  {
     const blogs = await prisma.blog.findMany({
         where : whereFilter,
         orderBy : [{
-            views : "desc",
-            
+            views : "desc",            
         },
         {
             votes : {
@@ -345,7 +344,7 @@ blogRouter.put('/update/:id', async (c) => {
         return c.text("error occcurred")
     }    
 })
-blogRouter.get('/vote/check', async (c) => {
+blogRouter.post('/vote/check', async (c) => {
     try{
         const body = await c.req.json();
         const prisma = new PrismaClient({
@@ -370,7 +369,7 @@ blogRouter.get('/vote/check', async (c) => {
     }    
 })
 
-blogRouter.put('/vote', async (c) => {
+blogRouter.post('/vote', async (c) => {
     try{
             const body = await c.req.json();
             const prisma = new PrismaClient({

@@ -4,16 +4,24 @@ import axios from 'axios';
 import { BACKEND_URL } from '../config';
 import LoadingBlogs from '../components/LoadingBlogs';
 import DropdownWithSearch from '../components/Dropdown';
+import { useNavigate } from 'react-router-dom';
 const HomePage = () => {
 
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
+    const [error, setError] = useState(null);
+    const navigate=useNavigate();
+    const genre={
+        genre:"all",
+        
+    }
     useEffect(() => {
-        axios.get(`${BACKEND_URL}/api/blog/all`, {
+        axios.post(`${BACKEND_URL}/api/blog/sort/views`, genre,{
+            
             headers: {
+                'Content-Type': 'application/json',
                 Authorization: localStorage.getItem("token")
             }
         })
@@ -21,8 +29,45 @@ const HomePage = () => {
                 setBlogs(response.data)
                 setLoading(false);
             })
-    }, [])
+            .catch(err => {
+                if (err.response && err.response.status === 403) {
+                    // Handle 403 Forbidden by setting an error state
+                    setError('Unauthorized access. You do not have permission to view this page.');
+                    navigate('/signin');
+                } else {
+                    // Handle other errors
+                    setError('An unexpected error occurred.');
+                    navigate('/signin');
 
+                }
+                setLoading(false);
+            });
+    }, [])
+    useEffect(() => {
+        axios.post(`${BACKEND_URL}/api/blog/total`,genre, {
+            headers: {
+                Authorization: localStorage.getItem("token")
+            }
+        })
+            .then(response => {
+                
+                setTotalPages(response.data.total)
+                setLoading(false);
+            })
+            .catch(err => {
+                if (err.response && err.response.status === 403) {
+                    // Handle 403 Forbidden by setting an error state
+                    setError('Unauthorized access. You do not have permission to view this page.');
+                    navigate('/signin');
+                } else {
+                    // Handle other errors
+                    setError('An unexpected error occurred.');
+                    navigate('/signin');
+
+                }
+                setLoading(false);
+            });
+    }, [])
     
     return (
 
@@ -44,7 +89,10 @@ const HomePage = () => {
                     id={blog.id}
                     authorName={blog.author.name || "Anonymous"}
                     title={blog.title}
-                    publishedDate={"23/2/2023"}
+                    publishedDate={blog.createdAt}
+                    genre={blog.genre}
+                    views={blog.views}
+                    votes={blog.votes}
                 />)}</div>}
             </div>
             {!loading&&<div>
