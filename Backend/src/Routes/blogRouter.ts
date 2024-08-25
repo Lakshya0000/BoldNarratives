@@ -291,7 +291,35 @@ blogRouter.get('/blog/:id',async (c) => {
     }
     return c.json({blog})
 })
-
+blogRouter.delete('/delete/:id', async (c)=>{
+    try{
+        const prisma = new PrismaClient({
+            datasourceUrl: c.env.DATABASE_URL
+        }).$extends(withAccelerate())
+        const blogId = parseInt(c.req.param("id"))
+        const votes = await prisma.vote.deleteMany({
+            where : {
+                blogId : blogId
+            }
+        })
+        const comments = await prisma.comment.deleteMany({
+            where : {
+                BlogId : blogId
+            }
+        })
+        const blog = await prisma.blog.delete({
+            where : {
+                id : blogId
+            }
+        })
+        return c.json({message : "Blog deleted Succesfully"})
+    }
+    catch(e){
+        c.status(500);
+        console.log(e);
+        return c.text("error occcurred")
+    }
+})
 const blogBody = z.object({
     title : z.string(),
     content : z.string(),
