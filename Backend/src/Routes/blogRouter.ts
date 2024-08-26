@@ -269,13 +269,29 @@ blogRouter.get('/blog/:id',async (c) => {
             content : true,
             views : true,
             authorId : true,
+            genre : true,
             author : {
                 select : {
                     name : true
                 }
             },
             createdAt : true,
-            comments : true,
+            comments : {
+                orderBy : {
+                    createdAt : "desc"
+                },
+                select : {
+                    id : true,
+                    author : {
+                        select : {
+                            name : true
+                        }
+                    },
+                    comment : true,
+                    authorId : true,
+                    createdAt : true,
+                }
+            },
             _count : {
                 select : {
                     votes : true
@@ -438,10 +454,11 @@ blogRouter.post('/comment', async (c) => {
             datasourceUrl: c.env.DATABASE_URL
         }).$extends(withAccelerate())
         const userId = Number(c.get("userId"))
+        console.log(body)
         const comment = await prisma.comment.create({
             data : {
                 ...body,
-                userId : userId
+                authorId : userId
             }
         })
         return c.json({comment})
@@ -453,15 +470,15 @@ blogRouter.post('/comment', async (c) => {
     }    
 })
 
-blogRouter.get('/comment', async (c) => {
+blogRouter.get('/comment/:id', async (c) => {
     try{
         const prisma = new PrismaClient({
             datasourceUrl: c.env.DATABASE_URL
         }).$extends(withAccelerate())
-        const body = await c.req.json();
+        const id = c.req.param("id");
         const comments = await prisma.comment.findMany({
             where : {
-                BlogId : Number(body.id)
+                BlogId : Number(id)
             },
             orderBy : {
                 createdAt : "desc"

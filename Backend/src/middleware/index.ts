@@ -30,13 +30,13 @@ const authmiddleware = async (c:any,next:Next)=>{
         else
         {
             c.status(403);
-            return c.text("error ")
+            return c.text("Token Expired. Kindly login again")
         }
     }
     catch(e){
         console.log(e)
         c.status(403)
-        return c.text("error")
+        return c.text("Token Expired. Kindly login again.")
     }
 }
 
