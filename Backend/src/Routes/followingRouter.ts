@@ -29,19 +29,25 @@ export const followingRouter = new Hono<{ Bindings: Bindings,
                 },
                 select: {
                     followerId: true,
+                    following : {
+                        select : {
+                            name : true
+                        }
+                    }
                 }
             });
-            if (following.length === 0) {
-                return c.json({ message: "No following found" }, 404);
-            }
-            
-            return c.json({ following: following });
+            const filter_following = following.map((follow)=>{
+                return {
+                    name : follow.following.name,
+                    id : follow.followerId
+                }
+            })
+            return c.json(filter_following);
         } catch (e) {
             console.log(e);
+            c.status(500);
             return c.json({
                 message: "error occurred"
             })
         }
-    
-    
     })
