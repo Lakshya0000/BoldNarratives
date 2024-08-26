@@ -15,10 +15,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path='/blog' element={<BlogPage/>}/>
-        
-        
-        
+        <Route path='/blog' element={<BlogPage/>}/>        
       </Routes>
       
     </BrowserRouter>
