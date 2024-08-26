@@ -3,17 +3,33 @@ import Navbar from '../components/Navbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { BACKEND_URL } from '../config';
+import LoadingBlogs from '../components/LoadingBlogs';
 
 const BlogPage = () => {
-    const [blog,setBlog]=useState({});
-    const [loading,setLoading]=useState(false);
+    const [blog, setBlog] = useState({});
+    const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const navigate = useNavigate();
-    const [comment,setComment]=useState("");
-    const [check,setCheck] = useState(true);
+    const [comment, setComment] = useState("");
+    const [check, setCheck] = useState(true);
+    const [userId, setUserId] = useState(0);
+    const [selectedCommentId, setSelectedCommentId] = useState(null);
+
+    useEffect(() => {
+        axios.get(`${BACKEND_URL}/api/user/getid`, {
+            headers: {
+                Authorization: localStorage.getItem("token"),
+            }
+        }).then(response => {
+            setUserId(response.data.userId);
+        }).catch(err => {
+            alert("Your session has expired. Please log in again.");
+            navigate("/signin");
+        });
+    }, [navigate]);
+
     useEffect(() => {
         setLoading(true);
-        console.log(id)
         axios.get(`${BACKEND_URL}/api/blog/blog/${id}`, {
             headers: {
                 Authorization: localStorage.getItem("token")
@@ -22,108 +38,166 @@ const BlogPage = () => {
             if (response.status === 404) {
                 navigate("/home");
             } else {
-                const getBlog = response.data.blog
-                setBlog({...getBlog,name : getBlog.author.name,votes : getBlog._count.votes,comments : getBlog.comments }); // Ensure blog is set as an empty object if undefined
+                const getBlog = response.data.blog;
+                setBlog({ ...getBlog, name: getBlog.author.name, votes: getBlog._count.votes, comments: getBlog.comments });
                 setLoading(false);
             }
-            }).catch((err)=>{
-                navigate("/home")
-            })
-        
-    },[check])
-    const commentBody = {
-        comment,
-        BlogId : parseInt(id)
-    }
-    const handleComment=()=>{
-        console.log(commentBody)
-        axios.post(`${BACKEND_URL}/api/blog/comment`,commentBody,{
+        }).catch(() => {
+            navigate("/home");
+        });
+    }, [check, id, navigate]);
+
+    useEffect(() => {
+        async function incrementView() {
+            setLoading(true);
+            axios.put(`${BACKEND_URL}/api/blog/view`, {
+                id: parseInt(id)
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: localStorage.getItem("token")
+                }
+            }).then(response => {
+                const getBlog = response.data.blog;
+                setBlog({ ...getBlog, name: getBlog.author.name, votes: getBlog._count.votes, comments: getBlog.comments });
+            }).catch(err => {
+                if (err.status === 403) {
+                    setLoading(false);
+                    alert("Your session has expired. Please log in again.");
+                    navigate("/signin");
+                }
+            });
+            setLoading(false);
+        }
+
+        const timer = setTimeout(incrementView, 60000);
+        return () => clearTimeout(timer);
+    }, [id, navigate]);
+
+    const handleComment = () => {
+        const commentBody = {
+            comment,
+            BlogId: parseInt(id)
+        };
+
+        axios.post(`${BACKEND_URL}/api/blog/comment`, commentBody, {
             headers: {
-                'Content-Type':'application/json',
+                'Content-Type': 'application/json',
                 Authorization: localStorage.getItem("token")
             },
-        }).then(response=>{
+        }).then(() => {
             setComment("");
-            console.log("Succesfully addded comment")
-            return response.data
-        }).catch((e)=>{
-            console.log(e)
-        })
-        setCheck(!check)
-        }
+            setCheck(!check);
+        }).catch(e => {
+            console.log(e);
+        });
+    };
+
+    const handleDeleteComment = (commentId) => {
+        axios.delete(`${BACKEND_URL}/api/blog/comment/${commentId}`, {
+            headers: {
+                Authorization: localStorage.getItem("token")
+            }
+        }).then(() => {
+            setCheck(!check);
+            setSelectedCommentId(null);
+        }).catch(err => {
+            console.log(err);
+        });
+    };
+
     return (
         <div>
-            <Navbar/>
-            {/* <Blog id={blog?.id}
-                content={blog?.content}
-                authorName={blog?.name}
-                title={blog?.title}
-                genre={blog?.genre}
-                publishedDate={blog?.createdAt}
-                views={blog?.views}
-                votes={blog?.votes}
-                comments={blog?.comments} 
-            /> */}
-            <div>
-            <div className="flex justify-center">
-                <div className="grid grid-cols-12 px-10 w-full max-w-screen-xl pt-12">
-                    <div className="col-span-8">
-                        <div className="text-5xl font-extrabold">
-                            {blog?.title}
-                        </div>
-                        <div className="text-slate-500 pt-2">
-                            {`Post on ${new Date(blog?.createdAt).toLocaleDateString()}`}
-                        </div>
-                        <div className="pt-4">
-                            {blog?.content}
-                        </div>
-                    </div>
-                    <div className="col-span-4">
-                        <div className="text-slate-600 text-lg">
-                            Author
-                        </div>
-                        <div className="flex w-full">
-                            <div className="pr-4 flex flex-col justify-center">
-                                {/* Add author avatar or initials here if available */}
-                            </div>
-                            <div>
-                                <div className="text-xl font-bold">
-                                    {blog?.name || 'Anonymous'}
+            <Navbar />
+            {!loading && (
+                <div>
+                    <div className="flex justify-center">
+                        <div className="grid grid-cols-12 px-10 w-full max-w-screen-xl pt-12">
+                            <div className="col-span-8">
+                                <h1 className="text-5xl font-extrabold mb-4">{blog?.title}</h1>
+                                <div className="text-slate-500 pb-2">
+                                    {`Posted on ${new Date(blog?.createdAt).toLocaleDateString()}`}
                                 </div>
-                                <div className="pt-2 text-black">
-                                    {blog?.genre}
+                                <div className="text-slate-500 pb-4">
+                                    <strong>Genre:</strong> {blog?.genre || 'N/A'}
+                                </div>
+                                <div className="text-slate-600 pb-4">
+                                    <span className="mr-4">
+                                        <strong>Views:</strong> {blog?.views || 0}
+                                    </span>
+                                    <span>
+                                        <strong>Votes:</strong> {blog?.votes || 0}
+                                    </span>
+                                </div>
+                                <div className="text-lg leading-relaxed">
+                                    {blog?.content}
+                                </div>
+                            </div>
+                            <div className="col-span-4">
+                                <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+                                    <h2 className="text-xl font-bold mb-2">Author</h2>
+                                    <div className="flex items-center">
+                                        {/* Add author avatar or initials here if available */}
+                                        <div>
+                                            <h3 className="text-lg font-semibold">{blog?.name || 'Anonymous'}</h3>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {/* Comments Section */}
-            <div className="flex justify-center mt-10">
-                <div className="w-full max-w-screen-xl">
-                    <div className="text-2xl font-bold mb-4">Comments ({blog?.comments?.length})</div>
-                    <div className='flex flex-row items-center'>
-                    <input type="text" className='w-1/2 border h-10 flex justify-start items-start px-2' value={comment} onChange={(e)=>{setComment(e.target.value)}} />
-                    <button onClick={handleComment} className='px-3 bg-custom-teal'><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0 0 48 48">
-                        <path d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z"></path>
-                    </svg>
-                    </button>
-                    </div>
-                    {blog?.comments && blog?.comments.length > 0 ? (
-                        blog?.comments.map((comment, index) => (
-                            <div key={index} className="mb-4 p-4 border rounded-lg">
-                                {console.log(comment)}
-                                <div className="text-lg font-semibold">{comment.author.name}</div>
-                                <div className="text-slate-600">{comment.comment}</div>
+                    {/* Comments Section */}
+                    <div className="flex justify-center mt-10">
+                        <div className="w-full max-w-screen-xl">
+                            <h2 className="text-2xl font-bold mb-4">Comments ({blog?.comments?.length || 0})</h2>
+                            <div className='flex flex-row items-center mb-6'>
+                                <input
+                                    type="text"
+                                    className='w-2/3 border h-10 px-3 rounded-l-lg'
+                                    placeholder="Add a comment..."
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                />
+                                <button onClick={handleComment} className='px-4 bg-custom-teal text-white rounded-r-lg'>
+                                    Post
+                                </button>
                             </div>
-                        ))
-                    ) : (
-                        <div className="text-slate-500">No comments yet. Be the first to comment!</div>
-                    )}
+                            {blog?.comments && blog?.comments.length > 0 ? (
+                                blog?.comments.map((comment, index) => (
+                                    <div key={index} className="relative mb-4 p-4 border rounded-lg bg-white shadow-md">
+                                        {comment.authorId === userId && (
+                                            <button 
+                                                className="absolute top-2 right-2 p-1 focus:outline-none"
+                                                onClick={() => setSelectedCommentId(selectedCommentId === comment.id ? null : comment.id)}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48">
+                                                    <path d="M 24 8 C 21.8 8 20 9.8 20 12 C 20 14.2 21.8 16 24 16 C 26.2 16 28 14.2 28 12 C 28 9.8 26.2 8 24 8 z M 24 22 C 21.8 22 20 23.8 20 26 C 20 28.2 21.8 30 24 30 C 26.2 30 28 28.2 28 26 C 28 23.8 26.2 22 24 22 z M 24 36 C 21.8 36 20 37.8 20 40 C 20 42.2 21.8 44 24 44 C 26.2 44 28 42.2 28 40 C 28 37.8 26.2 36 24 36 z"></path>
+                                                </svg>
+                                            </button>
+                                        )}
+                                        <div className="text-lg font-semibold">{comment.author.name}</div>
+                                        <div className="text-slate-600">{comment.comment}</div>
+                                        {selectedCommentId === comment.id && comment.authorId === userId && (
+                                            <div className="absolute top-8 right-2 bg-white border rounded shadow-md">
+                                                <button 
+                                                    className="block w-full text-left px-4 py-2 hover:bg-red-200"
+                                                    onClick={() => handleDeleteComment(comment.id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-slate-500">No comments yet. Be the first to comment!</div>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            )}
+            {loading && <LoadingBlogs />}
         </div>
     );
 }

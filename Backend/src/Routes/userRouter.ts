@@ -138,7 +138,11 @@ userRouter.get('/view/:id',authmiddleware,async(c)=>{
     }
     
 })
-
+userRouter.get('/getid',authmiddleware,async(c)=>{
+    const userId = Number(c.get("userId"))
+    c.status(200);
+    return c.json({userId:userId})
+})
 userRouter.get('/profile',authmiddleware,async(c)=>{
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL

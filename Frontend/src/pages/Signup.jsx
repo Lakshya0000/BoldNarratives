@@ -25,7 +25,7 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await axios.post(`${BACKEND_URL}/api/user/signup`, {
-        name: firstname + lastname,
+        name: firstname + " " + lastname,
         email: email,
         password: password
       })
