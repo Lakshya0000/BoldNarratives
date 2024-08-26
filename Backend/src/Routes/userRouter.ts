@@ -103,6 +103,76 @@ userRouter.post('/signup', async (c) => {
     }
 })
 
+userRouter.get('/view/:id',authmiddleware,async(c)=>{
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate())
+
+    const idparam= c.req.param('id');
+    const id=parseInt(idparam);
+    try{
+        const response= await prisma.user.findFirst({
+            where:{
+                id:id
+            },
+            select:{
+                name:true,
+                followers:true,
+                following:true,
+                blogs:true
+                
+            }
+        })
+        if(response){
+            c.status(200);
+            return c.json({response});
+        }else
+        {
+            c.status(404);
+            return c.json({
+                message:"User Does not exists"
+            })
+        }
+    }catch(e){
+        return c.text("Error in profile view")
+    }
+    
+})
+
+userRouter.get('/profile',authmiddleware,async(c)=>{
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate());
+
+    const userId = Number(c.get("userId"))
+    try{
+        const response=await prisma.user.findFirst({
+            where:{
+                id:userId
+            },
+            select:{
+                id:true,
+                name:true,
+                followers:true,
+                following:true,
+                blogs:true,
+                email:true
+            }
+        })
+        if(response){
+            c.status(200);
+            return c.json({response})
+        }else
+        {
+            c.status(400);
+            return c.text("Error occurred in profile")
+        }
+    }catch(e){
+        console.log(e);
+        return c.text("Error occurred in profile")
+    }
+
+})
 const signinBody = z.object({
     email: z.string().email(),
     password: z.string()
