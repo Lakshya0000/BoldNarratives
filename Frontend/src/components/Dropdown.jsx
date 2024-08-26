@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 
-const DropdownWithSearch = () => {
+const DropdownWithSearch = ({genre,setGenre,post=false}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedOption, setSelectedOption] = useState('Genre');
 
   // Sample options for dropdown
   const options = [
@@ -11,9 +10,12 @@ const DropdownWithSearch = () => {
     'Informative',
     'Health',
     'Sci-Fi',
-    'Politics'
+    'Politics',
+    'Other'
   ];
-
+  if(post){
+    options.shift()
+  }
   const filteredOptions = options.filter(option =>
     option.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -29,7 +31,7 @@ const DropdownWithSearch = () => {
           type="text"
           className="p-2 w-full rounded-lg focus:outline-none"
           readOnly
-          value={selectedOption}
+          value={genre}
           placeholder="Sort"
         />
         <svg
@@ -59,7 +61,7 @@ const DropdownWithSearch = () => {
                   key={index}
                   className="p-2 hover:bg-gray-200 cursor-pointer"
                   onClick={() => {
-                    setSelectedOption(option);
+                    setGenre(option);
                     setIsOpen(false);
                   }}
                 >

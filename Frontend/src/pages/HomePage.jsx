@@ -14,12 +14,15 @@ const HomePage = () => {
     const [error, setError] = useState(null);
     const navigate=useNavigate();
     const skipPages= (page-1)*10;
-    const genre={
-        genre:"all",
+    const [genre,setGenre]=useState("All");
+    const genreF={
+        genre:genre.toLowerCase(),
         skip:skipPages
     }
     useEffect(() => {
-        axios.post(`${BACKEND_URL}/api/blog/sort/views`, genre,{
+        setLoading(true);
+        console.log(totalPages)
+        axios.post(`${BACKEND_URL}/api/blog/sort/views`, genreF,{
             
             headers: {
                 'Content-Type': 'application/json',
@@ -43,9 +46,10 @@ const HomePage = () => {
                 }
                 setLoading(false);
             });
-    }, [page])
+    }, [totalPages,page,genre])
     useEffect(() => {
-        axios.post(`${BACKEND_URL}/api/blog/total`,genre, {
+        setLoading(true);
+        axios.post(`${BACKEND_URL}/api/blog/total`,genreF, {
             headers: {
                 Authorization: localStorage.getItem("token")
             }
@@ -68,7 +72,7 @@ const HomePage = () => {
                 }
                 setLoading(false);
             });
-    }, [])
+    }, [genre])
     
     return (
 
@@ -80,13 +84,13 @@ const HomePage = () => {
                     <div className='text-white text-3xl font-bold font-sans -ml-5'>Bold Narratives</div>
                 </div>
                 <div className='w-full h-28 flex items-center justify-center'>
-                     <DropdownWithSearch/>
+                     <DropdownWithSearch genre={genre} setGenre={setGenre}/>
                     <input type="text" className=' p-2 w-2/5 ' placeholder='Search...'/>
                 </div>
             </div>
             <div>
                 {loading && <div className='w-screen flex justify-between flex-col items-center'><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /></div>}
-                {!loading && <div> {blogs.map(blog => <BlogCard
+                {!loading && blogs.length!=0 && <div> {blogs.map(blog => <BlogCard
                     key={blog.id}
                     id={blog.id}
                     authorName={blog.author.name || "Anonymous"}
@@ -96,6 +100,9 @@ const HomePage = () => {
                     views={blog.views}
                     votes={blog.votes}
                 />)}</div>}
+                {
+                    !loading && blogs.length==0 && <div className='flex justify-center items-center w-screen h-96'>No Blog Found</div>
+                }
             </div>
             {!loading&&<div>
                 <div className='flex justify-center items-center w-screen'>
