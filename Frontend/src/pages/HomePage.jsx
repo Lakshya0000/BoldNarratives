@@ -99,11 +99,15 @@ const HomePage = () => {
         <div>
             <div className=' w-screen h-28 bg-custom-teal flex flex-row justify-evenly'>
                 <div className=' flex flex-row items-center justify-start w-2/5'>
-
-                    <img src=" /blog2.png" alt="" className='w-28' />
-                    <div className='text-white text-3xl font-bold font-sans -ml-5'>Bold Narratives</div>
+                <Link to={'/home'}>
+                <div className='flex items-center justify-start'>
+                <img src=" /blog2.png" alt="" className='w-28' />
+                <div className='text-white text-3xl font-bold font-sans -ml-5'>Bold Narratives</div>
                 </div>
-                <div className='w-2/5 h-28 flex items-center justify-start  -ml-20'>
+                    
+                </Link>
+                </div>
+                <div className='w-2/5 h-28 flex items-center justify-start  -ml-56'>
                     <DropdownWithSearch genre={genre} setGenre={setGenre} />
                     <input type="text" className=' p-2 w-4/5 ' placeholder='Search...' onChange={(e) => {
 
@@ -131,7 +135,7 @@ const HomePage = () => {
                     {/* <div onClick={viewProfile} className='border border-white rounded-full w-10 h-10 flex justify-center items-center'></div>
                    <div className='font-bold text-white px-3'>{userInfo.response?.name}</div> */}
                    {/* </Link> */}
-                   <UserProfile/>
+                   <UserProfile userInfo={userInfo}/>
                 </div>
                 
 

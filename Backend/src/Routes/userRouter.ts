@@ -90,7 +90,7 @@ userRouter.post('/signup', async (c) => {
         const payload = {
             email: user.email,
             id: user.id,
-            exp: Math.floor(Date.now() / 1000) + 60 * 60,
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60,
         }
         // Add this before the sign function to verify
         const jwtToken = await sign(payload, c.env.JWT_SECRET);
@@ -207,7 +207,7 @@ userRouter.post('/signin', async (c) => {
             const payload = {
                 email: userExists.email,
                 id: userExists.id,
-                exp: Math.floor(Date.now() / 1000) + 60 * 60,
+                exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60,
             }
             const jwtToken = await sign(payload, c.env.JWT_SECRET);
 
