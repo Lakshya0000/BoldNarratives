@@ -7,6 +7,7 @@ import Landing from './pages/Landing'
 import HomePage from './pages/HomePage'
 import BlogPage from './pages/BlogPage'
 import CreateBlog from './pages/CreateBlog'
+import PF from './pages/PF'
 function App() {
     
     return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />        
         <Route path="/blog/:id" element={<BlogPage/>}/>
         <Route path="/blog/create" element={<CreateBlog/>}/>        
+        <Route path='/profile/:id' element={<PF/>}/>
       </Routes>
       
     </BrowserRouter>

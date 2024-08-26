@@ -4,11 +4,11 @@ import axios from 'axios';
 import { BACKEND_URL } from '../config';
 import LoadingBlogs from '../components/LoadingBlogs';
 import DropdownWithSearch from '../components/Dropdown';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import UserProfile from'../components/UserProfile'
 import ProfilePage from './ProfilePage';
-const HomePage = () => {
-
+const PF = () => {
+    const {id}=useParams();
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -19,21 +19,34 @@ const HomePage = () => {
     const skipPages = (page - 1) * 10;
     const [genre, setGenre] = useState("All");
     const [searchQuery, setsearchQuery] = useState("")
+    const [userInfo,setUserInfo] = useState([])
     const ref = useRef();
     const genreF = {
         genre: genre.toLowerCase(),
+        authorId:id,
         search: searchQuery,
         skip: skipPages
     }
+    useEffect(() => {
 
+        axios.get(`${BACKEND_URL}/api/user/getid`, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          }
+        }).then(response => {
+          setUserId(response.data.userId);
+        }).catch(err => {
+          alert("Your session has expired. Please log in again.");
+          navigate("/signin");
+        });
+      }, []);
     useEffect(()=>{
-        axios.get(`${BACKEND_URL}/api/user/getid`,{
+        axios.get(`${BACKEND_URL}/api/user/profile?id=${id}`,{
             headers: {
                 Authorization: `${localStorage.getItem("token")}`,
             }
         }).then(response => {
-            console.log(response.data.userId)
-            setUserId(response.data.userId)
+            setUserInfo(response.data)
         })
        
     },[])
@@ -133,10 +146,6 @@ const HomePage = () => {
                 </div>
                 
                 <div className='w-1/5 flex justify-center items-center'>
-                {/* <Link to={`/${id}`}> */}
-                    {/* <div onClick={viewProfile} className='border border-white rounded-full w-10 h-10 flex justify-center items-center'></div>
-                   <div className='font-bold text-white px-3'>{userInfo.response?.name}</div> */}
-                   {/* </Link> */}
                    <UserProfile userId={userId}/>
                 </div>
                 
@@ -144,6 +153,9 @@ const HomePage = () => {
 
             </div>
             <div ref={ref}>
+                <div>
+                <ProfilePage userInfo={userInfo}/>
+                </div>
                 {loading && <div className='w-screen flex justify-between flex-col items-center'><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /></div>}
                 {!loading && blogs.length != 0 && <div> {blogs.map(blog => <BlogCard
                     key={blog.id}
@@ -181,8 +193,10 @@ const HomePage = () => {
                     </div>
                 </div>
             </div>}
+
+            
         </div>
     );
 }
 
-export default HomePage;
+export default PF;

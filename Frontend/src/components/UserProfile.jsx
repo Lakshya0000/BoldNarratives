@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { BACKEND_URL } from '../config';
+import axios from 'axios';
 
-const UserProfile = ({ userInfo }) => {
+const UserProfile = ({ userId }) => {
     
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    
+    const [userInfo,setUserInfo] = useState({})
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
-
+    useEffect(()=>{
+        if(userId){axios.get(`${BACKEND_URL}/api/user/profile?id=${userId}`,{
+            headers: {
+                Authorization: localStorage.getItem("token"),
+            }
+        }).then((response)=>{
+            setUserInfo(response.data)
+        }).catch((err)=>{
+            setUserInfo({})
+        })}
+    },[userId])
     const logout=()=>{
         localStorage.removeItem('token');
           
     }
+
     return (
         <div className='relative justify-center items-center flex '>
             {/* Profile Icon */}

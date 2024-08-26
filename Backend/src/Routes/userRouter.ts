@@ -139,16 +139,22 @@ userRouter.get('/view/:id',authmiddleware,async(c)=>{
     
 })
 userRouter.get('/getid',authmiddleware,async(c)=>{
-    const userId = Number(c.get("userId"))
-    c.status(200);
-    return c.json({userId:userId})
+    try{
+        const userId = Number(c.get("userId"))
+        c.status(200);
+        return c.json({userId:userId})
+    }
+    catch(e){
+        c.status(400)
+        return c.json({userId:17})
+    }
 })
 userRouter.get('/profile',authmiddleware,async(c)=>{
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL
     }).$extends(withAccelerate());
 
-    const userId = Number(c.get("userId"))
+    const userId = Number(c.req.query("id"))
     try{
         const response=await prisma.user.findFirst({
             where:{

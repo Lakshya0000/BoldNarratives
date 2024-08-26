@@ -35,7 +35,8 @@ export const BlogCard = ({
   genre,
   publishedDate,
   views,
-  votes:initialVotes
+  votes:initialVotes,
+  authorId
 }) => {
 
 
@@ -114,7 +115,7 @@ export const BlogCard = ({
       </div>
       <div className="flex flex-col space-x-4 w-full">
         <div className="flex flex-col justify-end items-end w-full">
-          <span className="font-semibold text-lg ">Author: {authorName}</span>
+          <Link to={`/profile/${authorId}`}><span className="font-semibold text-lg ">Author: {authorName}</span></Link>
           <GenreIndicator genre={genre} />
           <span className="text-slate-500 font-bold text-sm">Uploaded {time(publishedDate)}</span>
 
