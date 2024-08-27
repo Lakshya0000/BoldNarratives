@@ -5,7 +5,7 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 ## Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Installation](#installation)
+- [Setup](#setup)
 - [Usage](#usage)
 - [Team](#contributors)
 
@@ -13,27 +13,36 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 - **SignUp/Signin** Authentication
   ![image](https://github.com/user-attachments/assets/5284db6f-be6e-43bc-ac0c-18b1749491eb)
 
+
 - **Create Blogs:** Users can create new blog posts with rich content.
   ![image](https://github.com/user-attachments/assets/a6eb947e-71ea-4017-b3b0-91dedc5697b9)
 
+
 - **View Blogs:** Browse and read blogs with ease. ( Views get updated only after at least one minute of reading.)
   ![image](https://github.com/user-attachments/assets/dc1507e3-0a33-439a-b58d-a472a0fc370f)
+
   
 - **Upvote Blogs:** Show appreciation for quality content by upvoting blogs.
   ![image](https://github.com/user-attachments/assets/d5c8a570-9020-49fb-8e44-03e690f6fb30)
 
+
 - **Comment on Blogs:** Engage with other users by commenting on blog posts.
   ![image](https://github.com/user-attachments/assets/ddc8e0c4-8368-4751-a7f4-a85e5bdfca9f)
+
 
 - **Delete Comments.** Can delete comments
   ![image](https://github.com/user-attachments/assets/62b8c371-9377-4256-9305-c0188c215d08)
 
+
 - **Follow Other users** Can follow other users.
   ![image](https://github.com/user-attachments/assets/4b4326ab-1b34-48df-8eba-3c4cb7f33d1a)
 
+
 - **Sort Blogs:** Sort blogs by upload time, number of views, trending status, and more.
+  
 - **Filter Blogs:** Filter blogs based on genres to find relevant content.
-  ![image](https://github.com/user-attachments/assets/303f242b-301d-46b0-9b8a-bc42135856e4)
+  ![image](https://github.com/user-attachments/assets/eea609d4-212b-49ba-aa5c-17e9dacec9c0)
+
   
 - **Search Blogs:** Search for blogs using keywords.
   ![image](https://github.com/user-attachments/assets/e3765a7e-808e-4c4f-8d48-c7a140fd06b1)
@@ -50,7 +59,7 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
   - [Prisma](https://www.prisma.io/) (ORM)
   - [PostgreSQL](https://www.postgresql.org/) (database)
 
-## Installation
+## Setup
 
 1. **Clone the repository:**
    ```bash
@@ -69,29 +78,14 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
    npm i
    cd ..
 
-4. **Setup Database**
-    - Ensure to have a postgress database link and prisma accelerate link.
-    - Create a wrangler.toml file in backend folder
-    - And copy the content of sample_wrangler to wrangler.toml and in database url add prisma accelerate link and in direct url add postgress sql link and write a jwt secret key
-    - Create a .env file and enter the database url and direct url as same as in wrangler.toml
-
-5. **Run Migration and Create a Prisma client**
-   - In ``` ./prisma/schema.prisma ``` replace the datasource db block with the below
-   ```
-   datasource db {
-    provider = "postgresql"
-    url      = env("DIRECT_URL")
-   }
-   ```
-   - Run ``` npx prisma migrate dev ```
-   - Again replace url in datasource db with ``` url = env("DATABASE_URL")  ```
-   - Run ``` npx prisma generate --no-engine ```
-
-6. **Run Frontend and Backend**
-   ``` npm run dev ```
+4. **Run Frontend**
+   ```bash
+   cd frontend
+   npm run dev
 
 
 ## Usage
+- Setup the project: [Setup](#setup)
 - Create an Account: Sign up to start creating and interacting with blogs.
 - Browse Blogs: Use the various sorting and filtering options to find blogs of interest.
 - Interact: Upvote, comment, and share your thoughts on blog posts.
