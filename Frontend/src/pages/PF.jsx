@@ -154,7 +154,7 @@ const PF = () => {
             </div>
             <div ref={ref}>
                 <div>
-                <ProfilePage userInfo={userInfo}/>
+                <ProfilePage userInfo1={userInfo}/>
                 </div>
                 {loading && <div className='w-screen flex justify-between flex-col items-center'><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /><LoadingBlogs /></div>}
                 {!loading && blogs.length != 0 && <div> {blogs.map(blog => <BlogCard

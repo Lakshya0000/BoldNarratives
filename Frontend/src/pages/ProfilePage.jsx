@@ -3,14 +3,20 @@ import axios from 'axios';
 import { BACKEND_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 import LoadingBlogs from '../components/LoadingBlogs'
-const ProfilePage = ({ userInfo }) => {
+const ProfilePage = ( {userInfo1} ) => {
 
   const navigate = useNavigate();
   const [userId, setUserId] = useState(0);
   const [isFollowing, setIsFollowing] = useState();
   const [loading,setLoading]=useState(false)
-  
+  const [userInfo,setUserInfo]=useState(userInfo1)
   useEffect(() => {
+    
+    setUserInfo(userInfo1);
+}, [userInfo1]);
+
+  useEffect(() => {
+    
     axios.get(`${BACKEND_URL}/api/user/getid`, {
       headers: {
         Authorization: localStorage.getItem("token"),
@@ -26,18 +32,26 @@ const ProfilePage = ({ userInfo }) => {
   
   
   useEffect(()=>{
-    if(userInfo?.response){setLoading(true)
-    axios.get(`${BACKEND_URL}/api/user/profile?id=${userInfo.response.id}`,{
+    console.log(userInfo?.response?.id )
+    if(userInfo?.userInfo1?.response){
+      setLoading(true)
+    axios.get(`${BACKEND_URL}/api/user/profile?id=${userInfo?.response?.id }`,{
       headers: {
         Authorization: localStorage.getItem("token"),
       }
     }).then(response=>{
-      userInfo = response.data
+      
+      setUserInfo(response.data);
+     
+      // userInfo=response.data
+      setLoading(false);
     }).catch(err=>{
       console.log(err)
+      setLoading(false);
     })
     setLoading(false)}
-  },[navigate,isFollowing])
+  },[navigate,isFollowing,userInfo1])
+  
   const handleFollow = () => {
     console.log(userId)
     console.log(userInfo.response.id)
@@ -50,7 +64,15 @@ const ProfilePage = ({ userInfo }) => {
         Authorization: localStorage.getItem("token"),
       }
     })
-      .then(() => setIsFollowing(true))
+      .then(() =>{ setIsFollowing(true)
+        setUserInfo(prevUserInfo => ({
+          ...prevUserInfo,
+          response: {
+            ...prevUserInfo.response,
+            followers: [...prevUserInfo.response.followers, { id: userId }] // Add the current user as a follower
+          }
+        }));
+      })
       .catch((error) => console.error('Error following user:', error));
   };
 
@@ -64,7 +86,15 @@ const ProfilePage = ({ userInfo }) => {
         Authorization: localStorage.getItem("token"),
       }
     })
-      .then(() => setIsFollowing(false))
+      .then(() => {setIsFollowing(false)
+        setUserInfo(prevUserInfo => ({
+          ...prevUserInfo,
+          response: {
+            ...prevUserInfo.response,
+            followers: prevUserInfo.response.followers.filter(follower => follower.id !== userId) // Remove the current user from followers
+          }
+        }));
+      })
       .catch((error) => console.error('Error unfollowing user:', error));
   };
   useEffect(()=>{
@@ -75,11 +105,12 @@ const ProfilePage = ({ userInfo }) => {
         Authorization: localStorage.getItem("token"),
       }
     }).then(response => {
+      console.log(response.data.follow)
       setIsFollowing(response.data.follow)
     }).catch(err => {
         console.log(err)
     })} 
-},[])
+},[userInfo?.response,navigate])
 
 
   return (
