@@ -16,7 +16,7 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 - **Create Blogs:** Users can create new blog posts with rich content.
   ![image](https://github.com/user-attachments/assets/a6eb947e-71ea-4017-b3b0-91dedc5697b9)
 
-- **View Blogs:** Browse and read blogs with ease.
+- **View Blogs:** Browse and read blogs with ease. ( Views get updated only after at least one minute of reading.)
   ![image](https://github.com/user-attachments/assets/dc1507e3-0a33-439a-b58d-a472a0fc370f)
   
 - **Upvote Blogs:** Show appreciation for quality content by upvoting blogs.
