@@ -14,19 +14,27 @@ const BlogPage = () => {
     const [check, setCheck] = useState(true);
     const [userId, setUserId] = useState(0);
     const [selectedCommentId, setSelectedCommentId] = useState(null);
-
+    const [viewed, setViewed] = useState(false);
     useEffect(() => {
         axios.get(`${BACKEND_URL}/api/user/getid`, {
             headers: {
                 Authorization: localStorage.getItem("token"),
             }
         }).then(response => {
-            setUserId(response.data.userId);
+            const user = response.data;
+            console.log(user);
+            if(user){
+                setUserId(user.userId);
+            }
+            else{
+                navigate('/signin')
+            }
         }).catch(err => {
             alert("Your session has expired. Please log in again.");
             navigate("/signin");
         });
-    }, [navigate]);
+        console.log(userId);
+    }, []);
 
     useEffect(() => {
         setLoading(true);
@@ -68,11 +76,16 @@ const BlogPage = () => {
                 }
             });
             setLoading(false);
+            setViewed(true);
         }
 
-        const timer = setTimeout(incrementView, 60000);
+        const timer = setTimeout(()=>{
+            if(!viewed){
+                incrementView();
+            }
+        }, 60000);
         return () => clearTimeout(timer);
-    }, [id, navigate]);
+    }, [viewed]);
 
     const handleComment = () => {
         const commentBody = {
@@ -94,6 +107,7 @@ const BlogPage = () => {
     };
 
     const handleDeleteComment = (commentId) => {
+        setLoading(true)
         axios.delete(`${BACKEND_URL}/api/blog/comment/${commentId}`, {
             headers: {
                 Authorization: localStorage.getItem("token")
