@@ -22,7 +22,7 @@ const GenreIndicator = ({ genre }) => {
   const { bg, border } = getRandomColor();
 
   return (
-    <span className={`text-slate-500 text-sm border rounded-2xl p-1 w-20 flex-frow items-center flex justify-evenly ${border}`}>
+    <span className={`text-slate-500 text-sm border rounded-2xl p-1 w-28 flex-frow items-center flex justify-evenly ${border}`}>
       <div className={`w-3 h-3 rounded-full ${bg}`}></div>
       {genre}
     </span>

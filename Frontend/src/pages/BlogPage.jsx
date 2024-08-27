@@ -173,7 +173,7 @@ const BlogPage = () => {
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                 />
-                                <button onClick={handleComment} className='px-4 bg-custom-teal text-white rounded-r-lg'>
+                                <button onClick={handleComment} className='px-4 bg-custom-teal text-white rounded-r-lg p-2'>
                                     Post
                                 </button>
                             </div>

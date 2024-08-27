@@ -109,7 +109,7 @@ const HomePage = () => {
                     
                 </Link>
                 </div>
-                <div className='w-2/5 h-28 flex items-center justify-start  -ml-56'>
+                <div className='w-2/5 h-28 flex items-center justify-start  -ml-44'>
                     <DropdownWithSearch genre={genre} setGenre={setGenre} />
                     <input type="text" className=' p-2 w-4/5 ' placeholder='Search...' onChange={(e) => {
 
@@ -131,7 +131,9 @@ const HomePage = () => {
 
                     }} />
                 </div>
-                
+                <div className='flex justify-center items-center'>
+                   <Link to={'/blog/create'}> <button className='p-2 w-18 border border-white rounded-lg text-white font-medium hover:scale-110' >Create</button></Link>
+                </div>
                 <div className='w-1/5 flex justify-center items-center'>
                 {/* <Link to={`/${id}`}> */}
                     {/* <div onClick={viewProfile} className='border border-white rounded-full w-10 h-10 flex justify-center items-center'></div>
