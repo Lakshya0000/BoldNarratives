@@ -10,14 +10,35 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 - [Team](#contributors)
 
 ## Features
+- **SignUp/Signin** Authentication
+  ![image](https://github.com/user-attachments/assets/5284db6f-be6e-43bc-ac0c-18b1749491eb)
+
 - **Create Blogs:** Users can create new blog posts with rich content.
+  ![image](https://github.com/user-attachments/assets/a6eb947e-71ea-4017-b3b0-91dedc5697b9)
+
 - **View Blogs:** Browse and read blogs with ease.
+  ![image](https://github.com/user-attachments/assets/dc1507e3-0a33-439a-b58d-a472a0fc370f)
+  
 - **Upvote Blogs:** Show appreciation for quality content by upvoting blogs.
+  ![image](https://github.com/user-attachments/assets/d5c8a570-9020-49fb-8e44-03e690f6fb30)
+
 - **Comment on Blogs:** Engage with other users by commenting on blog posts.
+  ![image](https://github.com/user-attachments/assets/ddc8e0c4-8368-4751-a7f4-a85e5bdfca9f)
+
+- **Delete Comments.** Can delete comments
+  ![image](https://github.com/user-attachments/assets/62b8c371-9377-4256-9305-c0188c215d08)
+
+- **Follow Other users** Cna follow other users.
+  ![image](https://github.com/user-attachments/assets/4b4326ab-1b34-48df-8eba-3c4cb7f33d1a)
+
 - **Sort Blogs:** Sort blogs by upload time, number of views, trending status, and more.
 - **Filter Blogs:** Filter blogs based on genres to find relevant content.
+  ![image](https://github.com/user-attachments/assets/303f242b-301d-46b0-9b8a-bc42135856e4)
+  
 - **Search Blogs:** Search for blogs using keywords.
+  ![image](https://github.com/user-attachments/assets/e3765a7e-808e-4c4f-8d48-c7a140fd06b1)
 
+  
 ## Tech Stack
 - **Frontend:**
   - [React](https://reactjs.org/)
@@ -75,6 +96,7 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 - Browse Blogs: Use the various sorting and filtering options to find blogs of interest.
 - Interact: Upvote, comment, and share your thoughts on blog posts.
 - Create Content: Write your own blogs and share them with the world.
+- Follow People: Can follow people with same interest
 
 ## Contributors
   - [Lakshya Agarwal](https://github.com/Lakshya0000)
