@@ -70,17 +70,9 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
    ```bash
    cd frontend
    npm i
-   cd ..
 
-3. **Navigate to Backend and install dependencies:**
+3. **Run Frontend**
    ```bash
-   cd backend
-   npm i
-   cd ..
-
-4. **Run Frontend**
-   ```bash
-   cd frontend
    npm run dev
 
 
