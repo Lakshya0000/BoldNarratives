@@ -28,7 +28,7 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 - **Delete Comments.** Can delete comments
   ![image](https://github.com/user-attachments/assets/62b8c371-9377-4256-9305-c0188c215d08)
 
-- **Follow Other users** Cna follow other users.
+- **Follow Other users** Can follow other users.
   ![image](https://github.com/user-attachments/assets/4b4326ab-1b34-48df-8eba-3c4cb7f33d1a)
 
 - **Sort Blogs:** Sort blogs by upload time, number of views, trending status, and more.
