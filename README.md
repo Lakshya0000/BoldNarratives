@@ -63,7 +63,7 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Lakshya0000/boldnarratives.git
+   git clone https://github.com/Lakshya0000/BoldNarratives.git
    cd boldnarratives
 
 2. **Navigate to Frontend and install dependencies:**
