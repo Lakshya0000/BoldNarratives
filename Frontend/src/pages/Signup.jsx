@@ -67,7 +67,7 @@ const Signup = () => {
         <img src=" /blog2.png" alt="" className='w-32' />
         <div className='text-white text-4xl font-bold font-sans -ml-5'>Bold Narratives</div>
       </div>
-      <div className='h-4/6 w-96 text-center shadow-md rounded-md bg-custom-white flex  flex-col'>
+      <div className='h-3/4 w-96 text-center shadow-md rounded-md bg-custom-white flex  flex-col'>
         <div className='flex justify-center flex-col items-center'>
           <Heading label={"Sign up"} />
           <div className='p-4 text-slate-500'>Enter you information to create an account </div>
