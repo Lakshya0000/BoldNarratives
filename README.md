@@ -87,4 +87,3 @@ BoldNarratives is a feature-rich blog management platform that allows users to c
 ## Contributors
   - [Lakshya Agarwal](https://github.com/Lakshya0000)
   - [Aditya Gunjkar](https://github.com/aditya-gg04)
-  - [Khushal Midha](https://github.com/khushalmidha)
